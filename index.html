@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Brandlete — Revenue Model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #070b18;
+    --navy-2: #0d1428;
+    --card: #111a33;
+    --card-2: #0f1830;
+    --line: #223056;
+    --line-soft: #1a2647;
+    --text: #eaf0ff;
+    --muted: #8ea0c8;
+    --muted-2: #5f719c;
+    --neon: #b4ff2e;
+    --neon-soft: rgba(180, 255, 46, 0.14);
+    --neon-line: rgba(180, 255, 46, 0.35);
+    --input-bg: #0a1122;
+    --shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background:
+      radial-gradient(1200px 700px at 80% -10%, rgba(180, 255, 46, 0.06), transparent 60%),
+      radial-gradient(900px 600px at -10% 10%, rgba(60, 110, 255, 0.08), transparent 55%),
+      var(--navy);
+    background-attachment: fixed;
+    color: var(--text);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  .grid-overlay {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(circle at 50% 20%, black, transparent 85%);
+  }
+
+  .wrap { position: relative; z-index: 1; max-width: 1080px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* Header */
+  header { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; margin-bottom: 8px; }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .shoe {
+    width: 46px; height: 46px; flex: none;
+    display: grid; place-items: center;
+    border-radius: 12px;
+    background: var(--neon-soft);
+    border: 1px solid var(--neon-line);
+    box-shadow: 0 0 22px rgba(180,255,46,0.18);
+  }
+  .shoe svg { width: 30px; height: 30px; }
+  .wordmark { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; }
+  .wordmark .b { color: var(--neon); }
+  .sub { color: var(--muted); font-size: 13px; font-weight: 500; margin-top: 2px; letter-spacing: 0.01em; }
+
+  .pdf-btn {
+    appearance: none; border: 1px solid var(--neon-line); cursor: pointer;
+    background: var(--neon-soft); color: var(--neon);
+    font-family: inherit; font-weight: 700; font-size: 13.5px; letter-spacing: 0.01em;
+    padding: 11px 18px; border-radius: 11px;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: background .15s ease, transform .05s ease, box-shadow .15s ease;
+  }
+  .pdf-btn:hover { background: rgba(180,255,46,0.22); box-shadow: 0 0 24px rgba(180,255,46,0.22); }
+  .pdf-btn:active { transform: translateY(1px); }
+  .pdf-btn svg { width: 16px; height: 16px; }
+
+  .title-row { margin: 30px 0 22px; }
+  .h1 { font-size: 34px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.12; }
+  .h1 .accent { color: var(--neon); }
+  .lead { color: var(--muted); font-size: 15px; margin-top: 8px; max-width: 640px; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 6px; background: var(--card-2); border: 1px solid var(--line-soft); padding: 5px; border-radius: 13px; margin-bottom: 26px; width: fit-content; max-width: 100%; flex-wrap: wrap; }
+  .tab {
+    appearance: none; border: none; cursor: pointer; font-family: inherit;
+    background: transparent; color: var(--muted); font-weight: 600; font-size: 13.5px;
+    padding: 9px 16px; border-radius: 9px; transition: all .15s ease; white-space: nowrap;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { background: var(--neon); color: #06210a; box-shadow: 0 4px 16px rgba(180,255,46,0.25); }
+
+  .panel { display: none; animation: fade .25s ease; }
+  .panel.active { display: block; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  /* Cards / layout */
+  .section-label { font-size: 11.5px; font-weight: 700; letter-spacing: 0.16em; color: var(--neon); text-transform: uppercase; margin: 0 0 14px 2px; }
+  .cols { display: grid; grid-template-columns: minmax(300px, 400px) 1fr; gap: 22px; align-items: start; }
+  @media (max-width: 780px) { .cols { grid-template-columns: 1fr; } }
+
+  .card {
+    background: linear-gradient(180deg, var(--card), var(--card-2));
+    border: 1px solid var(--line); border-radius: 16px; padding: 22px; box-shadow: var(--shadow);
+  }
+
+  .field { margin-bottom: 15px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label { display: block; font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 7px; }
+  .field .hint { font-weight: 400; color: var(--muted-2); font-size: 11.5px; }
+  .input-shell { position: relative; display: flex; align-items: center; }
+  .input-shell .prefix, .input-shell .suffix { position: absolute; color: var(--muted-2); font-weight: 600; font-size: 14px; pointer-events: none; }
+  .input-shell .prefix { left: 14px; }
+  .input-shell .suffix { right: 14px; }
+  input.num {
+    width: 100%; font-family: inherit; font-size: 15px; font-weight: 600; color: var(--text);
+    background: var(--input-bg); border: 1px solid var(--line); border-radius: 10px;
+    padding: 12px 14px; transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  input.num.has-prefix { padding-left: 26px; }
+  input.num.has-suffix { padding-right: 34px; }
+  input.num:focus { outline: none; border-color: var(--neon-line); box-shadow: 0 0 0 3px var(--neon-soft); }
+  input.num::-webkit-outer-spin-button, input.num::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  input.num { -moz-appearance: textfield; }
+
+  .auto-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em; color: var(--neon); background: var(--neon-soft); border: 1px solid var(--neon-line); border-radius: 6px; padding: 2px 7px; margin-left: 6px; vertical-align: middle; }
+  .link-reset { background: none; border: none; color: var(--muted-2); font-size: 11.5px; font-weight: 600; cursor: pointer; padding: 0; margin-top: 6px; text-decoration: underline; text-underline-offset: 2px; font-family: inherit; }
+  .link-reset:hover { color: var(--neon); }
+
+  /* Result cards */
+  .results { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 480px) { .results { grid-template-columns: 1fr; } }
+  .rcard { background: var(--card-2); border: 1px solid var(--line-soft); border-radius: 13px; padding: 16px 18px; }
+  .rcard .rl { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
+  .rcard .rv { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; }
+  .rcard.hero { grid-column: 1 / -1; background: linear-gradient(135deg, rgba(180,255,46,0.14), rgba(180,255,46,0.04)); border-color: var(--neon-line); }
+  .rcard.hero .rv { font-size: 34px; color: var(--neon); }
+  .rcard.hero .rl { color: #cfe6a0; }
+  .rcard .rv.small { font-size: 20px; }
+
+  /* Big stat row (growth) */
+  .bigstats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 22px; }
+  @media (max-width: 640px) { .bigstats { grid-template-columns: 1fr; } }
+  .stat { background: linear-gradient(180deg, var(--card), var(--card-2)); border: 1px solid var(--line); border-radius: 15px; padding: 18px 20px; box-shadow: var(--shadow); }
+  .stat.neon { background: linear-gradient(135deg, rgba(180,255,46,0.16), rgba(180,255,46,0.03)); border-color: var(--neon-line); }
+  .stat .sl { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 8px; }
+  .stat.neon .sl { color: #cfe6a0; }
+  .stat .sv { font-size: 30px; font-weight: 800; letter-spacing: -0.025em; }
+  .stat.neon .sv { color: var(--neon); }
+  .stat .sc { font-size: 12px; color: var(--muted-2); margin-top: 4px; font-weight: 500; }
+
+  /* Tables */
+  .tablecard { background: linear-gradient(180deg, var(--card), var(--card-2)); border: 1px solid var(--line); border-radius: 16px; padding: 8px; box-shadow: var(--shadow); overflow: hidden; }
+  .tablescroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 520px; }
+  th { text-align: right; font-weight: 700; color: var(--muted); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+  th:first-child, td:first-child { text-align: left; }
+  td { padding: 12px 16px; text-align: right; border-bottom: 1px solid var(--line-soft); font-weight: 600; font-variant-numeric: tabular-nums; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: rgba(255,255,255,0.018); }
+  td.mrr { color: var(--neon); }
+  tbody tr.final td { background: var(--neon-soft); }
+  tbody tr.final td:first-child { color: var(--neon); font-weight: 800; }
+
+  /* Editable tiers */
+  .tier-input { width: 100%; background: var(--input-bg); border: 1px solid var(--line); border-radius: 8px; color: var(--text); font-family: inherit; font-weight: 600; font-size: 13.5px; padding: 9px 11px; text-align: right; }
+  .tier-input:focus { outline: none; border-color: var(--neon-line); box-shadow: 0 0 0 3px var(--neon-soft); }
+  .tier-note { color: var(--muted); font-size: 13px; margin-top: 14px; }
+
+  footer { margin-top: 34px; color: var(--muted-2); font-size: 12px; text-align: center; }
+  footer .dot { color: var(--neon); }
+
+  .disclaimer { margin-top: 10px; color: var(--muted-2); font-size: 12px; line-height: 1.6; }
+
+  /* ---------- Print / PDF ---------- */
+  @media print {
+    @page { size: A4; margin: 14mm; }
+    body { background: #fff !important; color: #10131c !important; }
+    .grid-overlay, .tabs, .pdf-btn, .link-reset, .auto-badge { display: none !important; }
+    .wrap { max-width: none; padding: 0; }
+    .panel { display: block !important; page-break-after: always; }
+    .panel:last-child { page-break-after: auto; }
+    .panel .print-title { display: block !important; }
+    .card, .stat, .tablecard, .rcard { box-shadow: none !important; border-color: #d5dbe8 !important; background: #fff !important; }
+    .card, .tablecard { break-inside: avoid; }
+    .h1, .wordmark, .sub, .lead, .rcard .rv, .stat .sv, td, th, .field label, .section-label { color: #10131c !important; }
+    .wordmark .b, .h1 .accent, td.mrr, .stat.neon .sv, .section-label { color: #4c8f00 !important; }
+    .rcard.hero, .stat.neon, tbody tr.final td { background: #f2fbdf !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .rcard.hero .rv, .stat.neon .sv { color: #3f7a00 !important; }
+    .shoe { background: #f2fbdf !important; border-color: #cfe6a0 !important; }
+    input.num, .tier-input { border: 1px solid #cbd3e2 !important; color: #10131c !important; background: #fff !important; }
+    .muted, .rcard .rl, .stat .sl, .field label, th { color: #566078 !important; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+  .print-title { display: none; font-size: 20px; font-weight: 800; margin: 4px 0 18px; letter-spacing: -0.02em; }
+  .print-title .accent { color: var(--neon); }
+</style>
+</head>
+<body>
+<div class="grid-overlay"></div>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <div class="shoe">
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M2 21c3.6-.4 6-1.4 8.2-3.4 1.5-1.4 2.6-3 3.4-4.9.5-1.2 1.9-1.7 3-1 1 .6 1.3 1.5 2.4 2.2 1.3.9 2.7 1.2 4.6 1.5 2.4.4 4 1.1 5.1 2.4.9 1 1.3 2.1 1.3 3.2v.9c0 .7-.6 1.2-1.3 1.2H3.3C2.6 24 2 23.4 2 22.7V21z" fill="#b4ff2e"/>
+          <path d="M2 21c3.6-.4 6-1.4 8.2-3.4 1.5-1.4 2.6-3 3.4-4.9" stroke="#06210a" stroke-width="0.6" opacity="0.4"/>
+        </svg>
+      </div>
+      <div>
+        <div class="wordmark"><span class="b">B</span>randlete</div>
+        <div class="sub">Revenue Model</div>
+      </div>
+    </div>
+    <button class="pdf-btn" onclick="window.print()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Save as PDF
+    </button>
+  </header>
+
+  <div class="title-row">
+    <div class="h1">Deal &amp; growth <span class="accent">calculator</span></div>
+    <p class="lead">Type into any field. Every number recalculates live. When it looks right, hit <b>Save as PDF</b> for a clean copy to send.</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-panel="deal">Deal Calculator</button>
+    <button class="tab" data-panel="growth">Growth Projection</button>
+    <button class="tab" data-panel="tiers">Pricing Tiers</button>
+  </div>
+
+  <!-- ============ DEAL ============ -->
+  <section class="panel active" id="deal">
+    <div class="print-title"><span class="accent">Brandlete</span> — Single Deal Calculator</div>
+    <div class="cols">
+      <div class="card">
+        <div class="section-label">Inputs — one organization</div>
+        <div class="field">
+          <label>Number of athletes</label>
+          <div class="input-shell"><input class="num" id="d_athletes" type="number" min="0" step="1" value="3000"></div>
+        </div>
+        <div class="field">
+          <label>Price per athlete / month <span id="d_price_badge" class="auto-badge">AUTO · tier</span></label>
+          <div class="input-shell"><span class="prefix">$</span><input class="num has-prefix" id="d_price" type="number" min="0" step="0.05" value="2.00"></div>
+          <button class="link-reset" id="d_price_reset" style="display:none" onclick="resetDealPrice()">↺ back to tier price</button>
+        </div>
+        <div class="field">
+          <label>Sales tax <span class="hint">— enter a percent</span></label>
+          <div class="input-shell"><input class="num has-suffix" id="d_tax" type="number" min="0" step="0.1" value="0"><span class="suffix">%</span></div>
+        </div>
+        <div class="field">
+          <label>Monthly cost to serve <span class="hint">— what it costs us to run it</span></label>
+          <div class="input-shell"><span class="prefix">$</span><input class="num has-prefix" id="d_cost" type="number" min="0" step="1" value="0"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Results</div>
+        <div class="results">
+          <div class="rcard hero">
+            <div class="rl">Gross monthly revenue</div>
+            <div class="rv" id="r_gross">$6,000</div>
+          </div>
+          <div class="rcard">
+            <div class="rl">Net monthly (rev − cost)</div>
+            <div class="rv small" id="r_net">$6,000</div>
+          </div>
+          <div class="rcard">
+            <div class="rl">Sales tax collected</div>
+            <div class="rv small" id="r_tax">$0</div>
+          </div>
+          <div class="rcard">
+            <div class="rl">Gross annual (× 12)</div>
+            <div class="rv small" id="r_gross_a">$72,000</div>
+          </div>
+          <div class="rcard">
+            <div class="rl">Net annual (× 12)</div>
+            <div class="rv small" id="r_net_a">$72,000</div>
+          </div>
+        </div>
+        <p class="disclaimer">Price auto-fills from the volume tiers (see the Pricing Tiers tab). Type over it to lock a custom price for this deal.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ GROWTH ============ -->
+  <section class="panel" id="growth">
+    <div class="print-title"><span class="accent">Brandlete</span> — Company Growth Projection</div>
+    <div class="cols" style="margin-bottom:22px">
+      <div class="card">
+        <div class="section-label">Inputs — the whole company</div>
+        <div class="field">
+          <label>Starting # of organizations</label>
+          <div class="input-shell"><input class="num" id="g_start" type="number" min="0" step="1" value="5"></div>
+        </div>
+        <div class="field">
+          <label>Avg athletes per organization</label>
+          <div class="input-shell"><input class="num" id="g_ath" type="number" min="0" step="50" value="3000"></div>
+        </div>
+        <div class="field">
+          <label>Price per athlete / month</label>
+          <div class="input-shell"><span class="prefix">$</span><input class="num has-prefix" id="g_price" type="number" min="0" step="0.05" value="2.00"></div>
+        </div>
+        <div class="field">
+          <label>New orgs added per month</label>
+          <div class="input-shell"><input class="num" id="g_new" type="number" min="0" step="1" value="3"></div>
+        </div>
+        <div class="field">
+          <label>Monthly churn <span class="hint">— orgs lost, as a percent</span></label>
+          <div class="input-shell"><input class="num has-suffix" id="g_churn" type="number" min="0" step="0.5" value="2"><span class="suffix">%</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Where you land at month 12</div>
+        <div class="bigstats" style="grid-template-columns:1fr 1fr">
+          <div class="stat neon">
+            <div class="sl">Month-12 MRR</div>
+            <div class="sv" id="g_mrr">$203,364</div>
+            <div class="sc" id="g_orgs">34 active orgs</div>
+          </div>
+          <div class="stat neon">
+            <div class="sl">ARR run-rate</div>
+            <div class="sv" id="g_arr">$2.44M</div>
+            <div class="sc">MRR × 12</div>
+          </div>
+          <div class="stat">
+            <div class="sl">Cumulative revenue (12 mo)</div>
+            <div class="sv" id="g_cum" style="font-size:24px">$1.44M</div>
+          </div>
+          <div class="stat">
+            <div class="sl">Total athletes served</div>
+            <div class="sv" id="g_athletes" style="font-size:24px">101,682</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">12-month projection</div>
+    <div class="tablecard">
+      <div class="tablescroll">
+        <table>
+          <thead>
+            <tr><th>Month</th><th>Active orgs</th><th>Total athletes</th><th>MRR</th><th>Cumulative</th><th>ARR run-rate</th></tr>
+          </thead>
+          <tbody id="g_tbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <p class="disclaimer">Each month: <b>active orgs = prior × (1 − churn) + new orgs added</b>. Athletes, MRR, and run-rate follow from there.</p>
+  </section>
+
+  <!-- ============ TIERS ============ -->
+  <section class="panel" id="tiers">
+    <div class="print-title"><span class="accent">Brandlete</span> — Volume Pricing Tiers</div>
+    <div class="section-label">Volume pricing — edit freely</div>
+    <div class="tablecard" style="max-width:640px">
+      <div class="tablescroll">
+        <table>
+          <thead>
+            <tr><th>Min athletes</th><th>Max athletes</th><th>Price / athlete / mo</th></tr>
+          </thead>
+          <tbody id="t_tbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <p class="tier-note">The Deal Calculator reads the price from these tiers based on how many athletes you enter. Change a number here and the deal price auto-updates (unless you've typed a custom price over it).</p>
+  </section>
+
+  <footer>
+    Brandlete <span class="dot">•</span> Revenue Model <span class="dot">•</span> live &amp; interactive — enter your numbers, then Save as PDF
+  </footer>
+
+</div>
+
+<script>
+  // ---------- Pricing tiers (drives the deal auto-price) ----------
+  const tiers = [
+    { min: 0,    max: 499,    price: 4.00 },
+    { min: 500,  max: 999,    price: 3.50 },
+    { min: 1000, max: 2499,   price: 3.00 },
+    { min: 2500, max: 4999,   price: 2.00 },
+    { min: 5000, max: 999999, price: 1.50 },
+  ];
+
+  const $ = (id) => document.getElementById(id);
+  const money = (n) => '$' + Math.round(n).toLocaleString('en-US');
+  const money2 = (n) => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const compact = (n) => {
+    if (n >= 1e6) return '$' + (n / 1e6).toFixed(2).replace(/\.?0+$/, '') + 'M';
+    if (n >= 1e3) return '$' + (n / 1e3).toFixed(0) + 'K';
+    return money(n);
+  };
+  const num = (id) => { const v = parseFloat($(id).value); return isNaN(v) ? 0 : v; };
+
+  function tierPrice(athletes) {
+    let p = tiers[0].price;
+    for (const t of tiers) { if (athletes >= t.min) p = t.price; }
+    return p;
+  }
+
+  // ---------- Deal calculator ----------
+  let dealPriceOverridden = false;
+
+  function syncDealAutoPrice() {
+    if (dealPriceOverridden) return;
+    const athletes = num('d_athletes');
+    $('d_price').value = tierPrice(athletes).toFixed(2);
+  }
+
+  function resetDealPrice() {
+    dealPriceOverridden = false;
+    $('d_price_badge').style.display = '';
+    $('d_price_reset').style.display = 'none';
+    syncDealAutoPrice();
+    calcDeal();
+  }
+
+  function calcDeal() {
+    const athletes = num('d_athletes');
+    const price = num('d_price');
+    const tax = num('d_tax') / 100;
+    const cost = num('d_cost');
+
+    const gross = athletes * price;
+    const salesTax = gross * tax;
+    const net = gross - cost;
+
+    $('r_gross').textContent = money(gross);
+    $('r_tax').textContent = money(salesTax);
+    $('r_net').textContent = money(net);
+    $('r_gross_a').textContent = money(gross * 12);
+    $('r_net_a').textContent = money(net * 12);
+  }
+
+  // ---------- Growth projection ----------
+  function calcGrowth() {
+    const start = num('g_start');
+    const athPer = num('g_ath');
+    const price = num('g_price');
+    const newOrgs = num('g_new');
+    const churn = num('g_churn') / 100;
+
+    const tbody = $('g_tbody');
+    tbody.innerHTML = '';
+    let orgs = start;
+    let cumulative = 0;
+    let last = { orgs: 0, athletes: 0, mrr: 0, arr: 0, cum: 0 };
+
+    for (let m = 1; m <= 12; m++) {
+      if (m > 1) orgs = orgs * (1 - churn) + newOrgs;
+      const athletes = orgs * athPer;
+      const mrr = athletes * price;
+      cumulative += mrr;
+      const arr = mrr * 12;
+
+      const tr = document.createElement('tr');
+      if (m === 12) tr.className = 'final';
+      tr.innerHTML =
+        '<td>' + m + '</td>' +
+        '<td>' + Math.round(orgs).toLocaleString('en-US') + '</td>' +
+        '<td>' + Math.round(athletes).toLocaleString('en-US') + '</td>' +
+        '<td class="mrr">' + money(mrr) + '</td>' +
+        '<td>' + money(cumulative) + '</td>' +
+        '<td>' + money(arr) + '</td>';
+      tbody.appendChild(tr);
+
+      last = { orgs, athletes, mrr, arr, cum: cumulative };
+    }
+
+    $('g_mrr').textContent = money(last.mrr);
+    $('g_orgs').textContent = Math.round(last.orgs).toLocaleString('en-US') + ' active orgs';
+    $('g_arr').textContent = compact(last.arr);
+    $('g_cum').textContent = compact(last.cum);
+    $('g_athletes').textContent = Math.round(last.athletes).toLocaleString('en-US');
+  }
+
+  // ---------- Tiers table (editable) ----------
+  function renderTiers() {
+    const tbody = $('t_tbody');
+    tbody.innerHTML = '';
+    tiers.forEach((t, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td><input class="tier-input" data-i="' + i + '" data-k="min" type="number" value="' + t.min + '"></td>' +
+        '<td><input class="tier-input" data-i="' + i + '" data-k="max" type="number" value="' + t.max + '"></td>' +
+        '<td><input class="tier-input" data-i="' + i + '" data-k="price" type="number" step="0.05" value="' + t.price.toFixed(2) + '"></td>';
+      tbody.appendChild(tr);
+    });
+    tbody.querySelectorAll('.tier-input').forEach(inp => {
+      inp.addEventListener('input', () => {
+        const i = +inp.dataset.i, k = inp.dataset.k;
+        const v = parseFloat(inp.value);
+        tiers[i][k] = isNaN(v) ? 0 : v;
+        syncDealAutoPrice();
+        calcDeal();
+      });
+    });
+  }
+
+  // ---------- Wiring ----------
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      $(tab.dataset.panel).classList.add('active');
+    });
+  });
+
+  $('d_athletes').addEventListener('input', () => { syncDealAutoPrice(); calcDeal(); });
+  $('d_price').addEventListener('input', () => {
+    dealPriceOverridden = true;
+    $('d_price_badge').style.display = 'none';
+    $('d_price_reset').style.display = '';
+    calcDeal();
+  });
+  ['d_tax', 'd_cost'].forEach(id => $(id).addEventListener('input', calcDeal));
+  ['g_start', 'g_ath', 'g_price', 'g_new', 'g_churn'].forEach(id => $(id).addEventListener('input', calcGrowth));
+
+  // ---------- Init ----------
+  renderTiers();
+  syncDealAutoPrice();
+  calcDeal();
+  calcGrowth();
+</script>
+</body>
+</html>
