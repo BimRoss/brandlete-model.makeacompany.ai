@@ -180,22 +180,41 @@
 
   /* ---------- Print / PDF ---------- */
   @media print {
-    @page { size: A4; margin: 14mm; }
-    body { background: #fff !important; color: #10131c !important; }
-    .grid-overlay, .tabs, .pdf-btn, .link-reset, .auto-badge { display: none !important; }
+    @page { size: A4; margin: 12mm; }
+    html, body { background: #fff !important; color: #10131c !important; }
+    .grid-overlay, .tabs, .pdf-btn, .link-reset, .auto-badge, footer, .title-row, .disclaimer, .tier-note { display: none !important; }
     .wrap { max-width: none; padding: 0; }
-    .panel { display: block !important; page-break-after: always; }
-    .panel:last-child { page-break-after: auto; }
-    .panel .print-title { display: block !important; }
-    .card, .stat, .tablecard, .rcard { box-shadow: none !important; border-color: #d5dbe8 !important; background: #fff !important; }
-    .card, .tablecard { break-inside: avoid; }
-    .h1, .wordmark, .sub, .lead, .rcard .rv, .stat .sv, td, th, .field label, .section-label { color: #10131c !important; }
-    .wordmark .b, .h1 .accent, td.mrr, .stat.neon .sv, .section-label { color: #4c8f00 !important; }
-    .rcard.hero, .stat.neon, tbody tr.final td { background: #f2fbdf !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .rcard.hero .rv, .stat.neon .sv { color: #3f7a00 !important; }
+    header { margin-bottom: 10px; }
+
+    /* One section per page, flowing top-down — no forced breaks that leave blanks */
+    .panel { display: block !important; }
+    #growth, #tiers { page-break-before: always; }
+    .print-title { display: block !important; margin: 2px 0 10px; font-size: 18px; }
+
+    /* Keep the two-column dashboard side-by-side on paper */
+    .cols { display: grid !important; grid-template-columns: 1.05fr 1fr !important; gap: 12px !important; margin-bottom: 10px !important; }
+    .card { padding: 15px !important; }
+    .card, .tablecard, .stat, .rcard { break-inside: avoid; box-shadow: none !important; border-color: #d5dbe8 !important; background: #fff !important; }
+    .results { grid-template-columns: 1fr 1fr !important; }
+    .bigstats { grid-template-columns: 1fr 1fr !important; margin-bottom: 12px !important; }
+    .section-label { margin-bottom: 8px !important; }
+    table { min-width: 0 !important; font-size: 11.5px; }
+    th, td { padding: 6px 12px !important; }
+    .field { margin-bottom: 10px !important; }
+    .stat { padding: 13px 16px !important; }
+
+    /* Colors for paper */
+    .h1, .wordmark, .sub, .lead, .rcard .rv, .stat .sv, .stat .sc, td, .field label, .print-title { color: #10131c !important; }
+    .wordmark .b, .h1 .accent, .print-title .accent, td.mrr, .stat.neon .sv, .section-label { color: #4c8f00 !important; }
+    .rcard.hero, .stat.neon, tbody tr.final td { background: #f2fbdf !important; }
+    .rcard.hero .rv, .stat.neon .sv, tbody tr.final td:first-child { color: #3f7a00 !important; }
+    .rcard.hero .rl, .stat.neon .sl { color: #4c7a12 !important; }
     .shoe { background: #f2fbdf !important; border-color: #cfe6a0 !important; }
-    input.num, .tier-input { border: 1px solid #cbd3e2 !important; color: #10131c !important; background: #fff !important; }
-    .muted, .rcard .rl, .stat .sl, .field label, th { color: #566078 !important; }
+    input.num, .tier-input { border: 1px solid #cbd3e2 !important; color: #10131c !important; background: #fff !important; font-weight: 700 !important; }
+    .rcard, .stat { border: 1px solid #e2e7f0 !important; }
+    td { border-bottom: 1px solid #eceff5 !important; }
+    th { border-bottom: 1px solid #d5dbe8 !important; }
+    .rcard .rl, .stat .sl, .field label, th, .stat .sc { color: #5a6478 !important; }
     * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   }
   .print-title { display: none; font-size: 20px; font-weight: 800; margin: 4px 0 18px; letter-spacing: -0.02em; }
